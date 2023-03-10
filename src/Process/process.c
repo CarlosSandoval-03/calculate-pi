@@ -13,8 +13,20 @@ double execution_time(clock_t start, clock_t end)
 	return (double)(end - start) / CLOCKS_PER_SEC;
 }
 
-void run_two_process()
+double run_one_process()
 {
+	clock_t start = clock();
+
+	long double pi = leibniz_approx_pi(0, _MAX_ITERATIONS);
+	printf("PI: %.20Lf", pi);
+
+	clock_t end = clock();
+	return execution_time(start, end);
+}
+
+double run_two_process()
+{
+	clock_t start = clock();
 	pid_t pid;
 	pid = fork();
 
@@ -35,7 +47,7 @@ void run_two_process()
 		exit(EXIT_SUCCESS);
 	}
 
-	if (pid != 0){
+	if (pid != 0) {
 		long double partial_pi = leibniz_approx_pi(mid, max);
 
 		FILE *file = open_file("./data/two_process/father.txt", "w");
@@ -54,4 +66,11 @@ void run_two_process()
 	fclose(file);
 
 	printf("PI: %.20Lf", p1 + p2);
+	clock_t end = clock();
+
+	return execution_time(start, end);
+}
+
+double run_four_process()
+{
 }

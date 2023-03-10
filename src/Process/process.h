@@ -7,6 +7,8 @@
 #include <time.h>
 
 double execution_time(clock_t start, clock_t end);
-void run_two_process();
+double run_one_process();
+double run_two_process();
+double run_four_process();
 
 #endif // _PROCESS_H_
