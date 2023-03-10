@@ -13,5 +13,7 @@ int main(int argc, char **argv)
 	printf("\nExecution time: %f secs\n", execution_time);
 
 	printf("\n\nSTART FOUR PROCESS\n");
+	execution_time = run_four_process();
+	printf("\nExecution time: %f secs\n", execution_time);
 	return EXIT_SUCCESS;
 }
