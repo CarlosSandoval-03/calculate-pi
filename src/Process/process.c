@@ -8,6 +8,14 @@
 #include "../File/file.h"
 #include "./process.h"
 
+void check_fork_error(pid_t pid)
+{
+	if (pid == -1) {
+		perror("FORK: AN UNEXPECTED ERROR OCCURRED DURING THE FORK");
+		exit(EXIT_FAILURE);
+	}
+}
+
 double execution_time(clock_t start, clock_t end)
 {
 	return (double)(end - start) / CLOCKS_PER_SEC;
@@ -30,13 +38,9 @@ double run_two_process()
 	pid_t pid;
 	pid = fork();
 
-	if (pid == -1) {
-		perror("FORK: AN UNEXPECTED ERROR OCCURRED DURING THE FORK");
-		exit(EXIT_FAILURE);
-	}
+	check_fork_error(pid);
 
-	unsigned long max = _MAX_ITERATIONS;
-	unsigned long mid = max / 2;
+	unsigned long mid = _MAX_ITERATIONS / 2;
 	if (pid == 0) {
 		long double partial_pi = leibniz_approx_pi(0, mid);
 
@@ -48,7 +52,7 @@ double run_two_process()
 	}
 
 	if (pid != 0) {
-		long double partial_pi = leibniz_approx_pi(mid, max);
+		long double partial_pi = leibniz_approx_pi(mid, _MAX_ITERATIONS);
 
 		FILE *file = open_file("./data/two_process/father.txt", "w");
 		write_long_double(partial_pi, file);
@@ -77,10 +81,7 @@ double run_four_process()
 	pid_t pid;
 	pid = fork();
 
-	if (pid == -1) {
-		perror("FORK: AN UNEXPECTED ERROR OCCURRED DURING THE FORK");
-		exit(EXIT_FAILURE);
-	}
+	check_fork_error(pid);
 
 	unsigned long factor = _MAX_ITERATIONS / 4;
 
@@ -89,10 +90,7 @@ double run_four_process()
 		pid_t npid;
 		npid = fork();
 
-		if (npid == -1) {
-			perror("FORK: AN UNEXPECTED ERROR OCCURRED DURING THE FORK");
-			exit(EXIT_FAILURE);
-		}
+		check_fork_error(npid);
 
 		// Nested child
 		if (npid == 0) {
@@ -124,10 +122,7 @@ double run_four_process()
 		pid_t npid;
 		npid = fork();
 
-		if (npid == -1) {
-			perror("FORK: AN UNEXPECTED ERROR OCCURRED DURING THE FORK");
-			exit(EXIT_FAILURE);
-		}
+		check_fork_error(npid);
 
 		// Nested child
 		if (npid == 0) {
