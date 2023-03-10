@@ -34,42 +34,27 @@ double run_one_process()
 
 double run_two_process()
 {
+	char *path_array[] = { "./data/two_process/child.txt", "./data/two_process/father.txt" };
 	clock_t start = clock();
 	pid_t pid;
 	pid = fork();
-
 	check_fork_error(pid);
 
-	unsigned long mid = _MAX_ITERATIONS / 2;
+	unsigned long middle = _MAX_ITERATIONS / 2;
 	if (pid == 0) {
-		long double partial_pi = leibniz_approx_pi(0, mid);
-
-		FILE *file = open_file("./data/two_process/child.txt", "w");
-		write_long_double(partial_pi, file);
-		fclose(file);
-
+		long double partial_pi = leibniz_approx_pi(0, middle);
+		write_partial_pi(path_array[0], partial_pi);
 		exit(EXIT_SUCCESS);
 	}
 
 	if (pid != 0) {
-		long double partial_pi = leibniz_approx_pi(mid, _MAX_ITERATIONS);
-
-		FILE *file = open_file("./data/two_process/father.txt", "w");
-		write_long_double(partial_pi, file);
-		fclose(file);
-
+		long double partial_pi = leibniz_approx_pi(middle, _MAX_ITERATIONS);
+		write_partial_pi(path_array[1], partial_pi);
 		wait(NULL);
 	}
 
-	FILE *file = open_file("./data/two_process/child.txt", "r");
-	long double p1 = read_long_double(file);
-	fclose(file);
-
-	file = open_file("./data/two_process/father.txt", "r");
-	long double p2 = read_long_double(file);
-	fclose(file);
-
-	printf("PI: %.20Lf", p1 + p2);
+	long double pi = read_partials_pi(path_array, 2);
+	printf("PI: %.20Lf", pi);
 	clock_t end = clock();
 
 	return execution_time(start, end);
@@ -77,40 +62,30 @@ double run_two_process()
 
 double run_four_process()
 {
+	char *path_array[] = { "./data/four_process/child_of_child.txt", "./data/four_process/child.txt",
+												 "./data/four_process/child_of_father.txt", "./data/four_process/father.txt" };
 	clock_t start = clock();
 	pid_t pid;
 	pid = fork();
-
 	check_fork_error(pid);
 
 	unsigned long factor = _MAX_ITERATIONS / 4;
-
-	// Child
 	if (pid == 0) {
 		pid_t npid;
 		npid = fork();
-
 		check_fork_error(npid);
 
 		// Nested child
 		if (npid == 0) {
 			long double partial_pi = leibniz_approx_pi(0, (1 * factor));
-
-			FILE *file = open_file("./data/four_process/child_of_child.txt", "w");
-			write_long_double(partial_pi, file);
-			fclose(file);
-
+			write_partial_pi(path_array[0], partial_pi);
 			exit(EXIT_SUCCESS);
 		}
 
 		// Child
 		if (npid != 0) {
 			long double partial_pi = leibniz_approx_pi((1 * factor), (2 * factor));
-
-			FILE *file = open_file("./data/four_process/child.txt", "w");
-			write_long_double(partial_pi, file);
-			fclose(file);
-
+			write_partial_pi(path_array[1], partial_pi);
 			wait(NULL); // wait - Nested child
 		}
 
@@ -121,51 +96,27 @@ double run_four_process()
 	if (pid != 0) {
 		pid_t npid;
 		npid = fork();
-
 		check_fork_error(npid);
 
 		// Nested child
 		if (npid == 0) {
 			long double partial_pi = leibniz_approx_pi((2 * factor), (3 * factor));
-
-			FILE *file = open_file("./data/four_process/child_of_father.txt", "w");
-			write_long_double(partial_pi, file);
-			fclose(file);
-
+			write_partial_pi(path_array[2], partial_pi);
 			exit(EXIT_SUCCESS);
 		}
 
 		// Father
 		if (npid != 0) {
 			long double partial_pi = leibniz_approx_pi((3 * factor), (4 * factor));
-
-			FILE *file = open_file("./data/four_process/father.txt", "w");
-			write_long_double(partial_pi, file);
-			fclose(file);
-
+			write_partial_pi(path_array[3], partial_pi);
 			wait(NULL); // wait - nested child
 		}
 
 		wait(NULL); // wait - child
 	}
 
-	FILE *file = open_file("./data/four_process/child_of_child.txt", "r");
-	long double p1 = read_long_double(file);
-	fclose(file);
-
-	file = open_file("./data/four_process/child.txt", "r");
-	long double p2 = read_long_double(file);
-	fclose(file);
-
-	file = open_file("./data/four_process/child_of_father.txt", "r");
-	long double p3 = read_long_double(file);
-	fclose(file);
-
-	file = open_file("./data/four_process/father.txt", "r");
-	long double p4 = read_long_double(file);
-	fclose(file);
-
-	printf("PI: %.20Lf", p1 + p2 + p3 + p4);
+	long double pi = read_partials_pi(path_array, 4);
+	printf("PI: %.20Lf", pi);
 	clock_t end = clock();
 
 	return execution_time(start, end);

@@ -24,3 +24,23 @@ long double read_long_double(FILE *file)
 	fscanf(file, "%Lf", &number);
 	return number;
 }
+
+void write_partial_pi(char *path, long double partial_pi)
+{
+	FILE *file = open_file(path, "w");
+	write_long_double(partial_pi, file);
+	fclose(file);
+}
+
+long double read_partials_pi(char *path_array[], int num_elements)
+{
+	long double pi = 0.0;
+	FILE *file = NULL;
+	for (int i = 0; i < num_elements; i++) {
+		file = open_file(path_array[i], "r");
+		pi += read_long_double(file);
+		fclose(file);
+	}
+
+	return pi;
+}
