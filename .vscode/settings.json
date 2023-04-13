@@ -1,0 +1,7 @@
+{
+	"cSpell.words": ["leibniz", "npid"],
+	"files.associations": {
+		"*.rmd": "markdown",
+		"file.h": "c"
+	}
+}
