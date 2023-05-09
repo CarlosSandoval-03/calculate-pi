@@ -23,8 +23,15 @@ void *leibniz_approx_pi(void *params_ptr)
 	}
 
 	long double x = 0.0;
+	long double aux = 0.0;
 	for (unsigned long i = (params->start); i < (params->end); i++) {
-		x += pow(-1, i) / (2 * i + 1);
+		aux = 1.0 / (2 * i + 1);
+		
+		// Apply sign
+		if (i % 2 == 0)
+			x += aux;
+		else
+			x -= aux;
 	}
 	x *= 4;
 
